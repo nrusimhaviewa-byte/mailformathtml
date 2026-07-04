@@ -60,6 +60,9 @@ def main():
     if HAS_PREMAILER and not args.no_inline:
         print("Inlining CSS styles using premailer...")
         try:
+            import logging
+            import cssutils
+            cssutils.log.setLevel(logging.CRITICAL)
             html_content = transform(html_content)
         except Exception as e:
             print(f"Error during CSS inlining: {e}")
