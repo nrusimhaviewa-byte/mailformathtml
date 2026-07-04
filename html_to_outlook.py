@@ -41,7 +41,9 @@ def main():
     parser.add_argument("html_file", help="Path to the source HTML file")
     parser.add_argument("-s", "--subject", default="Converted HTML Email", help="Subject of the email")
     parser.add_argument("-t", "--to", default="", help="Recipient email address")
+    parser.add_argument("-o", "--output", default="", help="Save the fully rendered HTML to this output file")
     parser.add_argument("--no-inline", action="store_true", help="Skip CSS inlining even if premailer is installed")
+    parser.add_argument("--no-outlook", action="store_true", help="Skip creating the Outlook draft (useful if you only want to output the file)")
 
     args = parser.parse_args()
 
@@ -68,8 +70,18 @@ def main():
             print(f"Error during CSS inlining: {e}")
             print("Proceeding with original HTML...")
 
-    # Create the email
-    create_outlook_email(html_content, subject=args.subject, to=args.to)
+    # Save output if requested
+    if args.output:
+        try:
+            with open(args.output, 'w', encoding='utf-8') as f:
+                f.write(html_content)
+            print(f"Successfully saved fully rendered HTML to: {args.output}")
+        except Exception as e:
+            print(f"Failed to save output file: {e}")
+
+    # Create the email unless explicitly skipped
+    if not args.no_outlook:
+        create_outlook_email(html_content, subject=args.subject, to=args.to)
 
 if __name__ == "__main__":
     main()
